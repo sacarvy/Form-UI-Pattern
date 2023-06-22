@@ -5,18 +5,20 @@ type Options = {
   // TODO: Add reveals options
 };
 
-type Fields = {
-  type: "select" | "text" | "number" ;
+type Field = {
+  type: "select" | "text" | "number" | "email" | "date" | "radio" | "checkbox";
   id: string;
   label?: string;
   as?: "dropdown" | "combobox";
   selectMultiple?: boolean;
   options?: Array<Options>;
+  value?: string;
+  required?: boolean;
 };
 
 export type Form = {
   title?: string;
-  fields: Array<Fields>;
+  fields: Array<Field>;
 };
 
 export type StepperForm = {
