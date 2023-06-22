@@ -15,6 +15,7 @@ export default function FormFields() {
                 required={field.required || false}
                 key={field.id}
                 placeholder={field.label}
+                id={field.id}
                 value={field.value as string}
                 register={register}
               />
@@ -25,6 +26,7 @@ export default function FormFields() {
                 required={field.required || false}
                 type="email"
                 key={field.id}
+                id={field.id}
                 placeholder={field.label}
                 value={field.value as string}
                 register={register}

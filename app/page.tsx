@@ -24,7 +24,8 @@ export default function Home() {
     ],
   };
   return (
-    <div className="h-screen transition flex justify-center items-center">
+    <div className="h-screen transition flex justify-center items-center flex-col gap-10">
+      <h1 className="text-white text-7xl font-bold">Compound Form</h1>
       <Form form={form} onSubmit={(value) => {
         console.log(value)
       }} className="flex flex-col gap-4" />

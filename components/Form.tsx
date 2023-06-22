@@ -12,11 +12,12 @@ type Props = {
 };
 
 export default function Form({ form, className, onSubmit }: Props) {
-  const methods = useForm();
-  const { handleSubmit } = methods;
+  const { handleSubmit, register } = useForm({
+    // resolver: ''
+  });
   return (
     <>
-      <FormContext.Provider value={{ form, register: methods.register }}>
+      <FormContext.Provider value={{ form, register }}>
         <form className={className} onSubmit={handleSubmit(onSubmit)}>
           <FormFields />
           <button

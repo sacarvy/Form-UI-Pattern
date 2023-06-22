@@ -7,15 +7,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default React.forwardRef<HTMLInputElement, InputProps>(function Input(
-  { register, placeholder, className, ...props },
+  { register, id, className, ...props },
   ref
 ) {
   return (
     <>
       <input
-        placeholder={placeholder}
+        id={id}
         className={`w-96 py-2 px-2 rounded-md ${className}`}
-        {...register(placeholder as string)}
+        {...register(id as string)}
         {...props}
         ref={ref}
       />
