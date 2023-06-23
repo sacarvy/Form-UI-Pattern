@@ -27,6 +27,6 @@ export type Form = {
   fields: Array<Field>;
 };
 
-export type StepperForm = {
+export type MultiStepForm = {
   steps: Array<Form>;
 };

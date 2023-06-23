@@ -4,11 +4,15 @@ import Input from "./ui/Input";
 import generateDefaultValues from "@/utils/generateDefaultValues";
 import { FormErrors, FormField } from "./ui/FormComponents";
 import Select from "./ui/Select";
+import { useContext } from "react";
+import { MultiStepFormContext } from "@/app/page";
 
 export default function FormWrapper({
+  lastStep = true,
   formData,
   onSubmit,
 }: {
+  lastStep: boolean;
   formData: FormTypes;
   onSubmit: (data: unknown) => void;
 }) {
@@ -19,21 +23,30 @@ export default function FormWrapper({
   return (
     <>
       <FormProvider {...methods}>
-        <Form methods={methods} onSubmit={onSubmit} formData={formData} />
+        <Form
+          methods={methods}
+          lastStep={lastStep}
+          onSubmit={onSubmit}
+          formData={formData}
+        />
       </FormProvider>
     </>
   );
 }
 
 function Form({
+  lastStep,
   methods,
   onSubmit,
   formData,
 }: {
+  lastStep: boolean;
   methods: UseFormReturn;
   onSubmit: (data: unknown) => void;
   formData: FormTypes;
 }) {
+  const { next, prev, stepCount } = useContext(MultiStepFormContext);
+
   return (
     <>
       <form
@@ -126,12 +139,31 @@ function Form({
           }
         })}
 
-        <button
-          type="submit"
-          className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
-        >
-          Submit
-        </button>
+        {!lastStep ? (
+          <div className="flex justify-between items-center gap-4">
+            <button
+              type="submit"
+              className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
+              onClick={prev}
+            >
+              Prev
+            </button>
+            <button
+              type="submit"
+              className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
+              onClick={next}
+            >
+              Next
+            </button>
+          </div>
+        ) : (
+          <button
+            type="submit"
+            className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
+          >
+            Submit
+          </button>
+        )}
       </form>
     </>
   );
