@@ -1,7 +1,15 @@
 "use client";
 import Input from "@/components/ui/Input";
 import { Form as FormTypes } from "@/types";
-import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
+import {
+  Controller,
+  FormProvider,
+  UseFormReturn,
+  useForm,
+  FieldValues,
+  FieldPath,
+  ControllerProps,
+} from "react-hook-form";
 
 const form: FormTypes = {
   fields: [
@@ -42,6 +50,15 @@ function FormWrapper({ formData }: { formData: FormTypes }) {
   );
 }
 
+const FormField = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  ...props
+}: ControllerProps<TFieldValues>) => {
+  return <Controller {...props} />;
+};
+
 function Form({
   methods,
   onSubmit,
@@ -57,40 +74,47 @@ function Form({
         onSubmit={methods.handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
-        {formData.fields.map((field) => {
-          switch (field.type) {
+        {formData.fields.map((fieldData) => {
+          switch (fieldData.type) {
             case "text":
               return (
-                <Input
-                  key={field.id}
-                  placeholder={field.label}
-                  id={field.id}
-                  {...methods.register(field.id, {
-                    required: field.required || false,
-                  })}
-                  value={field.value as string}
+                <FormField
+                  key={fieldData.id}
+                  control={methods.control}
+                  name={fieldData.id}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        type="text"
+                        id={fieldData.id}
+                        name={field.name}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        value={field.value}
+                        ref={field.ref}
+                      />
+                    );
+                  }}
                 />
               );
             case "email":
               return (
-                <Input
-                  type="email"
-                  key={field.id}
-                  id={field.id}
-                  placeholder={field.label}
-                  value={field.value as string}
-                  {...methods.register(field.id, {
-                    required: field.required || false,
-                  })}
+                <FormField
+                  key={fieldData.id}
+                  control={methods.control}
+                  name={fieldData.id}
+                  render={({ field }) => {
+                    return <Input type="email" {...field} />;
+                  }}
                 />
               );
             case "select":
-              if (!field.options) {
+              if (!fieldData.options) {
                 throw Error("Provide options for select");
               }
               return (
-                <select key={field.id}>
-                  {field.options.map((option) => {
+                <select key={fieldData.id}>
+                  {fieldData.options.map((option) => {
                     return (
                       <option key={option.id} value={option.label}>
                         {option.label}
