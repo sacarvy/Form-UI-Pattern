@@ -1,3 +1,5 @@
+import { FieldValues, RegisterOptions } from "react-hook-form";
+
 type Options = {
   id: string;
   label: string;
@@ -13,6 +15,10 @@ type Field = {
   selectMultiple?: boolean;
   options?: Array<Options>;
   value?: string;
+  rules?: Omit<
+    RegisterOptions<FieldValues, string>,
+    "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"
+  >;
   required?: boolean;
 };
 
@@ -23,4 +29,4 @@ export type Form = {
 
 export type StepperForm = {
   steps: Array<Form>;
-}
+};

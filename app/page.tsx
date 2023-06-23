@@ -1,149 +1,66 @@
 "use client";
-import Input from "@/components/ui/Input";
+import Form from "@/components/Form";
 import { Form as FormTypes } from "@/types";
-import {
-  Controller,
-  FormProvider,
-  UseFormReturn,
-  useForm,
-  FieldValues,
-  FieldPath,
-  ControllerProps,
-} from "react-hook-form";
+import { useState } from "react";
 
 const form: FormTypes = {
   fields: [
     {
       type: "text",
-      id: "some",
+      id: "username",
+      value: "Your name",
       label: "Which is your favourite colour?",
+      rules: {
+        required: "What you doing bro?",
+      },
     },
     {
       type: "select",
       id: "some2",
       label: "example@gmail.com",
+      rules: {
+        required: "This field is required",
+      },
       options: [
         {
-          id: "Something",
-          label: "something",
+          id: "option1",
+          label: "option1",
+        },
+        {
+          id: "option2",
+          label: "option2",
+        },
+        {
+          id: "option3",
+          label: "option3",
+        },
+        {
+          id: "option4",
+          label: "option4",
         },
       ],
     },
     {
-      type: "text",
-      id: "some1",
+      type: "email",
+      value: "abc@gmail.com",
+      id: "companyEmail",
       label: "Which is your favourite colour?",
     },
   ],
 };
 
-function FormWrapper({ formData }: { formData: FormTypes }) {
-  const methods = useForm();
-  const onSubmit = (data: unknown) => console.log(data);
-
-  return (
-    <>
-      <FormProvider {...methods}>
-        <Form methods={methods} onSubmit={onSubmit} formData={formData} />
-      </FormProvider>
-    </>
-  );
-}
-
-const FormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
->({
-  ...props
-}: ControllerProps<TFieldValues>) => {
-  return <Controller {...props} />;
-};
-
-function Form({
-  methods,
-  onSubmit,
-  formData,
-}: {
-  methods: UseFormReturn;
-  onSubmit: (data: unknown) => void;
-  formData: FormTypes;
-}) {
-  return (
-    <>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
-        {formData.fields.map((fieldData) => {
-          switch (fieldData.type) {
-            case "text":
-              return (
-                <FormField
-                  key={fieldData.id}
-                  control={methods.control}
-                  name={fieldData.id}
-                  render={({ field }) => {
-                    return (
-                      <Input
-                        type="text"
-                        id={fieldData.id}
-                        name={field.name}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        value={field.value}
-                        ref={field.ref}
-                      />
-                    );
-                  }}
-                />
-              );
-            case "email":
-              return (
-                <FormField
-                  key={fieldData.id}
-                  control={methods.control}
-                  name={fieldData.id}
-                  render={({ field }) => {
-                    return <Input type="email" {...field} />;
-                  }}
-                />
-              );
-            case "select":
-              if (!fieldData.options) {
-                throw Error("Provide options for select");
-              }
-              return (
-                <select key={fieldData.id}>
-                  {fieldData.options.map((option) => {
-                    return (
-                      <option key={option.id} value={option.label}>
-                        {option.label}
-                      </option>
-                    );
-                  })}
-                </select>
-              );
-            default:
-              return null;
-          }
-        })}
-
-        <button
-          type="submit"
-          className="text-lg bg-blue-700 text-white py-1 w-full"
-        >
-          Submit
-        </button>
-      </form>
-    </>
-  );
-}
-
 export default function Home() {
+  const [Data, setData] = useState("");
   return (
     <div className="h-screen transition flex justify-center items-center flex-col gap-10">
-      <h1 className="text-white text-7xl font-bold">Compound Form</h1>
-      <FormWrapper formData={form} />
+      <h1 className="text-white text-7xl font-bold">Cool Form 😎</h1>
+      <Form
+        formData={form}
+        onSubmit={(data) => {
+          setData(JSON.stringify(data as Object));
+        }}
+      />
+      {Data && <p className="text-lg text-white">{Data}</p>}
     </div>
   );
 }
