@@ -1,3 +1,4 @@
+import { HTMLInputTypeAttribute } from "react";
 import { FieldValues, RegisterOptions } from "react-hook-form";
 
 type Options = {
@@ -8,9 +9,11 @@ type Options = {
 };
 
 type Field = {
-  type: "select" | "text" | "number" | "email" | "date" | "radio" | "checkbox";
+  type: HTMLInputTypeAttribute;
   id: string;
-  label?: string;
+  description?: string
+  placeholder?:string;
+  label: string;
   as?: "dropdown" | "combobox";
   selectMultiple?: boolean;
   options?: Array<Options>;
@@ -24,9 +27,19 @@ type Field = {
 
 export type Form = {
   title?: string;
+  id: string;
   fields: Array<Field>;
 };
 
 export type MultiStepForm = {
   steps: Array<Form>;
+};
+
+export type TStep = {
+  [key: string]: string;
+};
+
+export type TMultiStepFormContext = {
+  prev: () => void;
+  stepCount: number;
 };

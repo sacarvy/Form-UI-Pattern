@@ -1,11 +1,23 @@
-import { Form as FormTypes } from "@/types";
-import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
-import Input from "./ui/Input";
-import generateDefaultValues from "@/utils/generateDefaultValues";
-import { FormErrors, FormField } from "./ui/FormComponents";
-import Select from "./ui/Select";
 import { useContext } from "react";
-import { MultiStepFormContext } from "@/app/page";
+import {
+  FormProvider,
+  UseFormReturn,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
+
+import generateDefaultValues from "@/utils/generateDefaultValues";
+import { MultiStepFormContext } from "@/components/MultistepForm";
+import { Form as FormTypes } from "@/types";
+
+import FormDescription, {
+  FormErrors,
+  FormField,
+  FormItem,
+  Label,
+} from "./ui/FormComponents";
+import Input from "./ui/Input";
+import Select from "./ui/Select";
 
 export default function FormWrapper({
   lastStep = true,
@@ -45,8 +57,10 @@ function Form({
   onSubmit: (data: unknown) => void;
   formData: FormTypes;
 }) {
-  const { next, prev, stepCount } = useContext(MultiStepFormContext);
-
+  const { prev, stepCount } = useContext(MultiStepFormContext);
+  const {
+    formState: { errors },
+  } = useFormContext();
   return (
     <>
       <form
@@ -66,16 +80,20 @@ function Form({
                   render={({ field }) => {
                     return (
                       <>
-                        <Input
-                          type="text"
-                          id={fieldData.id}
-                          name={field.name}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          value={field.value}
-                          ref={field.ref}
-                        />
-                        <FormErrors />
+                        <FormItem>
+                          <Label>{fieldData.label}</Label>
+                          <Input
+                            placeholder={fieldData.placeholder || ""}
+                            type="text"
+                            {...field}
+                          />
+                          {fieldData.description && (
+                            <FormDescription>
+                              {fieldData.description}
+                            </FormDescription>
+                          )}
+                          <FormErrors />
+                        </FormItem>
                       </>
                     );
                   }}
@@ -100,8 +118,81 @@ function Form({
                   render={({ field }) => {
                     return (
                       <>
-                        <Input type="email" {...field} />
-                        <FormErrors />
+                        <FormItem>
+                          <Label>{fieldData.label}</Label>
+                          <Input type="email" {...field} />
+                          {fieldData.description && (
+                            <FormDescription>
+                              {fieldData.description}
+                            </FormDescription>
+                          )}
+                          <FormErrors />
+                        </FormItem>
+                      </>
+                    );
+                  }}
+                />
+              );
+            case "tel":
+              return (
+                <FormField
+                  key={fieldData.id}
+                  rules={
+                    fieldData.rules || {
+                      validate: {
+                        matchPattern: (v) =>
+                          /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/.test(v) ||
+                          "Enter a valid number",
+                      },
+                    }
+                  }
+                  control={methods.control}
+                  name={fieldData.id}
+                  render={({ field }) => {
+                    return (
+                      <>
+                        <FormItem>
+                          <Label>{fieldData.label}</Label>
+                          <Input type="tel" {...field} />
+                          {fieldData.description && (
+                            <FormDescription>
+                              {fieldData.description}
+                            </FormDescription>
+                          )}
+                          <FormErrors />
+                        </FormItem>
+                      </>
+                    );
+                  }}
+                />
+              );
+            case "number":
+              return (
+                <FormField
+                  key={fieldData.id}
+                  rules={
+                    fieldData.rules || {
+                      validate: {
+                        matchPattern: (v) =>
+                          /^[0-9]+$/.test(v) || "Enter a valid number",
+                      },
+                    }
+                  }
+                  control={methods.control}
+                  name={fieldData.id}
+                  render={({ field }) => {
+                    return (
+                      <>
+                        <FormItem>
+                          <Label>{fieldData.label}</Label>
+                          <Input type="number" {...field} />
+                          {fieldData.description && (
+                            <FormDescription>
+                              {fieldData.description}
+                            </FormDescription>
+                          )}
+                          <FormErrors />
+                        </FormItem>
                       </>
                     );
                   }}
@@ -119,16 +210,24 @@ function Form({
                   render={({ field }) => {
                     return (
                       <>
-                        <Select key={fieldData.id} {...field}>
-                          {fieldData.options!.map((option) => {
-                            return (
-                              <option key={option.id} value={option.label}>
-                                {option.label}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                        <FormErrors />
+                        <FormItem>
+                          <Label>{fieldData.label}</Label>
+                          <Select key={fieldData.id} {...field}>
+                            {fieldData.options!.map((option) => {
+                              return (
+                                <option key={option.id} value={option.label}>
+                                  {option.label}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                          {fieldData.description && (
+                            <FormDescription>
+                              {fieldData.description}
+                            </FormDescription>
+                          )}
+                          <FormErrors />
+                        </FormItem>
                       </>
                     );
                   }}
@@ -139,31 +238,46 @@ function Form({
           }
         })}
 
-        {!lastStep ? (
-          <div className="flex justify-between items-center gap-4">
-            <button
-              type="submit"
-              className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
-              onClick={prev}
-            >
-              Prev
-            </button>
-            <button
-              type="submit"
-              className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
-              onClick={next}
-            >
-              Next
-            </button>
-          </div>
-        ) : (
-          <button
-            type="submit"
-            className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
-          >
-            Submit
-          </button>
-        )}
+        <div className="flex justify-between items-center gap-4">
+          {!lastStep ? (
+            <>
+              {stepCount !== 0 && (
+                <button
+                  type="button"
+                  className="text-lg bg-blue-700 text-white py-1 w-full rounded-md disabled:opacity-70"
+                  onClick={prev}
+                  disabled={Object.keys(errors).length !== 0}
+                >
+                  Prev
+                </button>
+              )}
+              <button
+                type="submit"
+                className="text-lg bg-blue-700 text-white py-1 w-full rounded-md disabled:opacity-70"
+                disabled={Object.keys(errors).length !== 0}
+              >
+                Next
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
+                onClick={prev}
+              >
+                Prev
+              </button>
+              <button
+                type="submit"
+                className="text-lg bg-blue-700 text-white py-1 w-full rounded-md"
+                disabled={Object.keys(errors).length !== 0}
+              >
+                Submit
+              </button>
+            </>
+          )}
+        </div>
       </form>
     </>
   );
